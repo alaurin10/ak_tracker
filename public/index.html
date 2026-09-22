@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Days since Maddi mentioned Alaska</title>
+  <meta name="description" content="A running count of days since Maddi last mentioned Alaska.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Days since Maddi mentioned Alaska">
+  <meta property="og:description" content="A running count of days since Maddi last mentioned Alaska.">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Days since Maddi mentioned Alaska">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏔️</text></svg>">
+  <style>
+    :root {
+      --bg: #0f1c2e;
+      --bg2: #1b3350;
+      --fg: #f4f7fb;
+      --muted: #9fb3c8;
+      --accent: #7fd1c7;
+      --danger: #e86a5f;
+      --card: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.14);
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: radial-gradient(ellipse at top, var(--bg2), var(--bg) 70%) fixed;
+      background-color: var(--bg);
+      color: var(--fg);
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      padding: 24px 16px;
+      text-align: center;
+    }
+    main { width: 100%; max-width: 520px; }
+    .mountains { font-size: 44px; margin-bottom: 8px; }
+    .count {
+      font-size: clamp(96px, 32vw, 180px);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-variant-numeric: tabular-nums;
+      color: var(--accent);
+    }
+    .label { font-size: clamp(18px, 5vw, 24px); margin: 12px 0 4px; font-weight: 600; }
+    .since { color: var(--muted); margin: 0 0 28px; font-size: 15px; }
+    .stats {
+      display: flex; justify-content: center; gap: 12px; margin-bottom: 28px;
+    }
+    .stat {
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 10px 16px; min-width: 110px;
+    }
+    .stat b { display: block; font-size: 22px; font-variant-numeric: tabular-nums; }
+    .stat span { color: var(--muted); font-size: 13px; }
+    .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+    button {
+      font: inherit; font-weight: 600; cursor: pointer;
+      border-radius: 999px; padding: 12px 20px; border: 1px solid var(--border);
+      background: var(--card); color: var(--fg);
+    }
+    button:hover { background: rgba(255, 255, 255, 0.12); }
+    button.reset { background: var(--danger); border-color: var(--danger); color: #fff; }
+    button.reset:hover { filter: brightness(1.08); }
+    button:disabled { opacity: 0.5; cursor: default; }
+    .toast {
+      position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+      background: var(--fg); color: var(--bg); padding: 10px 16px; border-radius: 8px;
+      font-weight: 600; opacity: 0; transition: opacity 0.2s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+    dialog {
+      background: var(--bg2); color: var(--fg); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px; width: min(360px, calc(100vw - 32px));
+    }
+    dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
+    dialog h2 { margin: 0 0 8px; font-size: 20px; }
+    dialog p { color: var(--muted); margin: 0 0 16px; font-size: 14px; }
+    dialog label { display: block; text-align: left; font-size: 14px; margin-bottom: 12px; }
+    dialog input {
+      display: block; width: 100%; margin-top: 6px; font: inherit; padding: 10px;
+      border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--fg);
+    }
+    dialog .row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+    .error { color: var(--danger); font-size: 14px; min-height: 1.2em; margin: 0 0 8px; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="mountains" aria-hidden="true">🏔️</div>
+    <div class="count" id="count">–</div>
+    <div class="label" id="label">days since Maddi last mentioned Alaska</div>
+    <p class="since" id="since">&nbsp;</p>
+
+    <div class="stats">
+      <div class="stat"><b id="best">–</b><span>longest streak</span></div>
+      <div class="stat"><b id="resets">–</b><span>times mentioned</span></div>
+    </div>
+
+    <div class="actions">
+      <button class="reset" id="resetBtn">She mentioned it 🙄</button>
+      <button id="shareBtn">Share image</button>
+      <button id="copyBtn">Copy text</button>
+    </div>
+  </main>
+
+  <dialog id="resetDialog">
+    <form method="dialog" id="resetForm">
+      <h2>Reset to 0?</h2>
+      <p>Back to square one.</p>
+      <label>When did she mention it?
+        <input type="date" id="resetDate" required>
+      </label>
+      <label id="pinRow" hidden>PIN
+        <input type="password" id="pin" inputmode="numeric" autocomplete="current-password">
+      </label>
+      <p class="error" id="resetError"></p>
+      <div class="row">
+        <button type="button" id="cancelBtn">Cancel</button>
+        <button type="submit" class="reset" id="confirmBtn">Reset</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    let state = null;
+
+    const storage = {
+      get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+      set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+    };
+
+    // YYYY-MM-DD of `date` in the tracker's timezone.
+    function ymd(date, tz) {
+      return new Intl.DateTimeFormat("en-CA", {
+        timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit",
+      }).format(date);
+    }
+    function daysBetween(from, to, tz) {
+      const d = (Date.parse(ymd(to, tz) + "T00:00:00Z") - Date.parse(ymd(from, tz) + "T00:00:00Z")) / 86400000;
+      return Math.max(0, Math.round(d));
+    }
+    function days() {
+      return daysBetween(new Date(state.lastReset), new Date(), state.timezone);
+    }
+    function dayWord(n) { return n === 1 ? "day" : "days"; }
+    function sinceText() {
+      const d = new Date(state.lastReset);
+      return "Last mentioned " + d.toLocaleDateString(undefined, {
+        timeZone: state.timezone, weekday: "long", month: "long", day: "numeric", year: "numeric",
+      });
+    }
+
+    function render() {
+      if (!state) return;
+      const n = days();
+      $("count").textContent = n;
+      $("label").textContent = `${dayWord(n)} since Maddi last mentioned Alaska`;
+      $("since").textContent = sinceText();
+      $("best").textContent = Math.max(state.best, n);
+      $("resets").textContent = state.resets;
+      document.title = `${n} ${dayWord(n)} since Maddi mentioned Alaska`;
+    }
+
+    function toast(msg) {
+      const t = $("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(toast.timer);
+      toast.timer = setTimeout(() => t.classList.remove("show"), 2000);
+    }
+
+    async function load() {
+      const res = await fetch("/api/state", { cache: "no-store" });
+      state = await res.json();
+      render();
+    }
+
+    // ---- Reset ----
+    $("resetBtn").onclick = () => {
+      if (!state) return;
+      const today = ymd(new Date(), state.timezone);
+      $("resetDate").value = today;
+      $("resetDate").max = today;
+      $("resetError").textContent = "";
+      $("pin").value = storage.get("ak-pin") || "";
+      $("resetDialog").showModal();
+    };
+    $("cancelBtn").onclick = () => $("resetDialog").close();
+
+    $("resetForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const date = $("resetDate").value;
+      const body = { pin: $("pin").value || undefined };
+      // Past dates are stored at noon UTC so they land on that calendar day.
+      if (date && date !== ymd(new Date(), state.timezone)) body.at = date + "T12:00:00Z";
+
+      $("confirmBtn").disabled = true;
+      try {
+        const res = await fetch("/api/state", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (res.status === 401) {
+          $("pinRow").hidden = false;
+          $("resetError").textContent = body.pin ? "Wrong PIN." : "Enter the PIN to reset.";
+          $("pin").focus();
+          return;
+        }
+        if (!res.ok) {
+          $("resetError").textContent = data.error || "Something went wrong.";
+          return;
+        }
+        if (body.pin) storage.set("ak-pin", body.pin);
+        state = data;
+        render();
+        $("resetDialog").close();
+        toast("Reset. Here we go again.");
+      } catch {
+        $("resetError").textContent = "Couldn't reach the server.";
+      } finally {
+        $("confirmBtn").disabled = false;
+      }
+    };
+
+    // ---- Share ----
+    function shareText() {
+      const n = days();
+      return `🏔️ It's been ${n} ${dayWord(n)} since Maddi last mentioned Alaska. ${location.origin}`;
+    }
+
+    $("copyBtn").onclick = async () => {
+      if (!state) return;
+      try {
+        await navigator.clipboard.writeText(shareText());
+        toast("Copied!");
+      } catch {
+        prompt("Copy this:", shareText());
+      }
+    };
+
+    function drawCard() {
+      const n = days();
+      const W = 1080, H = 1080;
+      const c = document.createElement("canvas");
+      c.width = W; c.height = H;
+      const g = c.getContext("2d");
+      const grad = g.createRadialGradient(W / 2, 0, 100, W / 2, H / 2, H);
+      grad.addColorStop(0, "#1b3350");
+      grad.addColorStop(1, "#0f1c2e");
+      g.fillStyle = grad;
+      g.fillRect(0, 0, W, H);
+
+      // Mountains along the bottom.
+      g.fillStyle = "rgba(255,255,255,0.06)";
+      g.beginPath();
+      g.moveTo(0, H);
+      g.lineTo(0, 900); g.lineTo(220, 740); g.lineTo(380, 860); g.lineTo(600, 640);
+      g.lineTo(800, 840); g.lineTo(940, 760); g.lineTo(W, 850); g.lineTo(W, H);
+      g.fill();
+
+      const font = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+      g.textAlign = "center";
+      g.fillStyle = "#9fb3c8";
+      g.font = `600 44px ${font}`;
+      g.fillText("It's been", W / 2, 230);
+
+      g.fillStyle = "#7fd1c7";
+      const size = String(n).length > 3 ? 300 : 380;
+      g.font = `800 ${size}px ${font}`;
+      g.fillText(String(n), W / 2, 560);
+
+      g.fillStyle = "#f4f7fb";
+      g.font = `700 56px ${font}`;
+      g.fillText(`${dayWord(n)} since Maddi`, W / 2, 680);
+      g.fillText("last mentioned Alaska", W / 2, 750);
+
+      g.fillStyle = "#9fb3c8";
+      g.font = `500 32px ${font}`;
+      g.fillText(location.host, W / 2, 1010);
+      return c;
+    }
+
+    $("shareBtn").onclick = async () => {
+      if (!state) return;
+      const blob = await new Promise((r) => drawCard().toBlob(r, "image/png"));
+      const file = new File([blob], `alaska-${days()}-days.png`, { type: "image/png" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], text: shareText() });
+        } catch {}
+        return;
+      }
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = file.name;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      toast("Image downloaded");
+    };
+
+    load().catch(() => { $("since").textContent = "Couldn't load the count."; });
+    setInterval(render, 60 * 1000);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") load().catch(() => {});
+    });
+  </script>
+</body>
+</html>
