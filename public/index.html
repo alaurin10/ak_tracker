@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Days since Maddi mentioned Alaska</title>
+  <meta name="description" content="A running count of days since Maddi last mentioned Alaska.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f5f7fb" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Days since Maddi mentioned Alaska">
+  <meta property="og:description" content="A running count of days since Maddi last mentioned Alaska.">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Days since Maddi mentioned Alaska">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏔️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --bg-glow: #dff3ef;
+      --surface: rgba(255, 255, 255, 0.72);
+      --surface-hover: #ffffff;
+      --border: rgba(15, 23, 42, 0.08);
+      --text: #0f172a;
+      --muted: #64748b;
+      --accent-1: #0ea5a4;
+      --accent-2: #2563eb;
+      --danger: #ef4444;
+      --danger-text: #ffffff;
+      --mtn-back: #dbe4f0;
+      --mtn-front: #c7d4e5;
+      --shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.06);
+      --backdrop: rgba(15, 23, 42, 0.35);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0b1220;
+        --bg-glow: #12324a;
+        --surface: rgba(255, 255, 255, 0.05);
+        --surface-hover: rgba(255, 255, 255, 0.09);
+        --border: rgba(255, 255, 255, 0.09);
+        --text: #f1f5f9;
+        --muted: #94a3b8;
+        --accent-1: #5eead4;
+        --accent-2: #60a5fa;
+        --danger: #f87171;
+        --danger-text: #1a0b0b;
+        --mtn-back: #14203a;
+        --mtn-front: #101a2f;
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
+        --backdrop: rgba(0, 0, 0, 0.6);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background:
+        radial-gradient(900px 500px at 50% -10%, var(--bg-glow), transparent 70%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: 32px 16px 120px;
+      text-align: center;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .mountains {
+      position: fixed; inset: auto 0 0 0; height: 30vh; min-height: 160px;
+      pointer-events: none; z-index: 0;
+    }
+    .mountains svg { width: 100%; height: 100%; display: block; }
+
+    main { position: relative; z-index: 1; width: 100%; max-width: 460px; }
+
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px; border-radius: 999px;
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--muted); font-size: 13px; font-weight: 500;
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    }
+    .dot {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--accent-1);
+      box-shadow: 0 0 0 0 var(--accent-1); animation: pulse 2.4s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-1) 60%, transparent); }
+      70%, 100% { box-shadow: 0 0 0 8px transparent; }
+    }
+
+    .count {
+      margin: 20px 0 0;
+      font-size: clamp(120px, 38vw, 200px);
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+      font-variant-numeric: tabular-nums;
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent;
+    }
+    .label {
+      margin: 12px 0 6px;
+      font-size: clamp(19px, 5vw, 23px); font-weight: 600; letter-spacing: -0.01em;
+      text-wrap: balance;
+    }
+    .since { color: var(--muted); margin: 0; font-size: 15px; min-height: 1.4em; }
+
+    .stats {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 32px 0 24px;
+    }
+    .stat {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      padding: 16px; box-shadow: var(--shadow);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    }
+    .stat b {
+      display: block; font-size: 26px; font-weight: 700; letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+    .stat span { color: var(--muted); font-size: 13px; font-weight: 500; }
+
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    button {
+      font: inherit; font-size: 15px; font-weight: 600; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      border-radius: 14px; padding: 14px 18px;
+      border: 1px solid var(--border); background: var(--surface); color: var(--text);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      transition: transform 0.12s ease, background 0.15s ease, filter 0.15s ease;
+    }
+    button:hover { background: var(--surface-hover); }
+    button:active { transform: scale(0.98); }
+    button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+    button:disabled { opacity: 0.6; cursor: default; }
+    button svg { width: 18px; height: 18px; flex: none; }
+    .primary {
+      grid-column: 1 / -1; background: var(--danger); border-color: transparent;
+      color: var(--danger-text); padding: 16px 18px; font-size: 16px;
+    }
+    .primary:hover { background: var(--danger); filter: brightness(1.06); }
+
+    .toast {
+      position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom));
+      transform: translate(-50%, 12px); z-index: 10;
+      background: var(--text); color: var(--bg); padding: 10px 18px; border-radius: 999px;
+      font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    dialog {
+      border: 1px solid var(--border); border-radius: 20px; padding: 24px;
+      width: min(360px, calc(100vw - 32px));
+      background: var(--bg); color: var(--text); box-shadow: 0 24px 64px rgba(0, 0, 0, 0.25);
+    }
+    dialog::backdrop { background: var(--backdrop); backdrop-filter: blur(4px); }
+    dialog h2 { margin: 0 0 6px; font-size: 20px; letter-spacing: -0.01em; }
+    dialog p { color: var(--muted); margin: 0 0 20px; font-size: 15px; }
+    dialog input {
+      display: block; width: 100%; margin: 0 0 8px; font: inherit; padding: 12px 14px;
+      border-radius: 12px; border: 1px solid var(--border); background: var(--surface);
+      color: var(--text); text-align: center; letter-spacing: 0.2em;
+    }
+    dialog input:focus { outline: 2px solid var(--accent-2); outline-offset: 1px; }
+    dialog .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+    dialog .primary { grid-column: auto; padding: 14px 18px; font-size: 15px; }
+    .error { color: var(--danger); font-size: 14px; min-height: 1.3em; margin: 0; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mountains" aria-hidden="true">
+    <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+      <path fill="var(--mtn-back)" d="M0 220 L180 120 L320 200 L520 60 L700 190 L880 90 L1060 180 L1240 70 L1440 170 V320 H0 Z"/>
+      <path fill="var(--mtn-front)" d="M0 280 L200 190 L380 260 L600 150 L820 270 L1000 200 L1200 260 L1440 200 V320 H0 Z"/>
+    </svg>
+  </div>
+
+  <main>
+    <span class="eyebrow"><span class="dot"></span>Alaska watch</span>
+    <div class="count" id="count" aria-live="polite">–</div>
+    <div class="label" id="label">days since Maddi last mentioned Alaska</div>
+    <p class="since" id="since"></p>
+
+    <div class="stats">
+      <div class="stat"><b id="best">–</b><span>Longest streak</span></div>
+      <div class="stat"><b id="resets">–</b><span>Times mentioned</span></div>
+    </div>
+
+    <div class="actions">
+      <button class="primary" id="resetBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+        She mentioned it
+      </button>
+      <button id="shareBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>
+        Share image
+      </button>
+      <button id="copyBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
+        Copy text
+      </button>
+    </div>
+  </main>
+
+  <dialog id="resetDialog">
+    <form id="resetForm">
+      <h2>Reset to 0?</h2>
+      <p>She mentioned Alaska again. Back to square one.</p>
+      <div id="pinRow" hidden>
+        <input type="password" id="pin" inputmode="numeric" placeholder="PIN" autocomplete="current-password" aria-label="PIN">
+      </div>
+      <p class="error" id="resetError"></p>
+      <div class="row">
+        <button type="button" id="cancelBtn">Cancel</button>
+        <button type="submit" class="primary" id="confirmBtn">Reset</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    let state = null;
+
+    const storage = {
+      get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+      set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+      remove(k) { try { localStorage.removeItem(k); } catch {} },
+    };
+
+    // Whole calendar days between two dates in the tracker's timezone.
+    function ymd(date, tz) {
+      return new Intl.DateTimeFormat("en-CA", {
+        timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit",
+      }).format(date);
+    }
+    function daysBetween(from, to, tz) {
+      const d = (Date.parse(ymd(to, tz) + "T00:00:00Z") - Date.parse(ymd(from, tz) + "T00:00:00Z")) / 86400000;
+      return Math.max(0, Math.round(d));
+    }
+    const days = () => daysBetween(new Date(state.lastReset), new Date(), state.timezone);
+    const dayWord = (n) => (n === 1 ? "day" : "days");
+
+    function sinceText() {
+      const d = new Date(state.lastReset);
+      return "Last mentioned " + d.toLocaleDateString(undefined, {
+        timeZone: state.timezone, weekday: "long", month: "long", day: "numeric",
+      });
+    }
+
+    // Count up to the number on first load / after a reset.
+    function animateCount(target) {
+      const el = $("count");
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduce || target < 2) { el.textContent = target; return; }
+      const start = performance.now(), dur = 700;
+      const step = (t) => {
+        const p = Math.min(1, (t - start) / dur);
+        el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+
+    function render(animate = false) {
+      if (!state) return;
+      const n = days();
+      if (animate) animateCount(n); else $("count").textContent = n;
+      $("label").textContent = `${dayWord(n)} since Maddi last mentioned Alaska`;
+      $("since").textContent = sinceText();
+      $("best").textContent = Math.max(state.best, n);
+      $("resets").textContent = state.resets;
+      document.title = `${n} ${dayWord(n)} since Maddi mentioned Alaska`;
+    }
+
+    function toast(msg) {
+      const t = $("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(toast.timer);
+      toast.timer = setTimeout(() => t.classList.remove("show"), 2000);
+    }
+
+    async function load(animate) {
+      const res = await fetch("/api/state", { cache: "no-store" });
+      state = await res.json();
+      render(animate);
+    }
+
+    // ---- Reset ----
+    $("resetBtn").onclick = () => {
+      if (!state) return;
+      const saved = storage.get("ak-pin");
+      $("pin").value = saved || "";
+      $("pinRow").hidden = !(state.pinRequired && !saved);
+      $("resetError").textContent = "";
+      $("resetDialog").showModal();
+      if (!$("pinRow").hidden) $("pin").focus();
+    };
+    $("cancelBtn").onclick = () => $("resetDialog").close();
+
+    $("resetForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const pin = $("pin").value || undefined;
+      $("confirmBtn").disabled = true;
+      try {
+        const res = await fetch("/api/state", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ pin }),
+        });
+        const data = await res.json();
+        if (res.status === 401) {
+          storage.remove("ak-pin");
+          $("pinRow").hidden = false;
+          $("resetError").textContent = pin ? "Wrong PIN." : "Enter the PIN to reset.";
+          $("pin").value = "";
+          $("pin").focus();
+          return;
+        }
+        if (!res.ok) {
+          $("resetError").textContent = data.error || "Something went wrong.";
+          return;
+        }
+        if (pin) storage.set("ak-pin", pin);
+        state = data;
+        render();
+        $("resetDialog").close();
+        toast("Reset. Here we go again.");
+      } catch {
+        $("resetError").textContent = "Couldn't reach the server.";
+      } finally {
+        $("confirmBtn").disabled = false;
+      }
+    };
+
+    // ---- Share ----
+    function shareText() {
+      const n = days();
+      return `🏔️ It's been ${n} ${dayWord(n)} since Maddi last mentioned Alaska. ${location.origin}`;
+    }
+
+    $("copyBtn").onclick = async () => {
+      if (!state) return;
+      try {
+        await navigator.clipboard.writeText(shareText());
+        toast("Copied to clipboard");
+      } catch {
+        prompt("Copy this:", shareText());
+      }
+    };
+
+    // Draws a square image using the page's current (light or dark) colors.
+    async function drawCard() {
+      await document.fonts.ready;
+      const css = getComputedStyle(document.documentElement);
+      const v = (name) => css.getPropertyValue(name).trim();
+      const n = days();
+      const W = 1080, H = 1080;
+      const c = document.createElement("canvas");
+      c.width = W; c.height = H;
+      const g = c.getContext("2d");
+
+      g.fillStyle = v("--bg");
+      g.fillRect(0, 0, W, H);
+      const glow = g.createRadialGradient(W / 2, -100, 50, W / 2, -100, 900);
+      glow.addColorStop(0, v("--bg-glow"));
+      glow.addColorStop(1, "rgba(0,0,0,0)");
+      g.fillStyle = glow;
+      g.fillRect(0, 0, W, H);
+
+      const ridge = (color, pts) => {
+        g.fillStyle = color;
+        g.beginPath();
+        g.moveTo(0, H);
+        pts.forEach(([x, y]) => g.lineTo(x, y));
+        g.lineTo(W, H);
+        g.fill();
+      };
+      ridge(v("--mtn-back"), [[0, 880], [140, 800], [260, 860], [420, 740], [560, 850], [700, 770], [840, 840], [960, 750], [W, 820]]);
+      ridge(v("--mtn-front"), [[0, 940], [160, 880], [300, 930], [480, 850], [660, 940], [800, 890], [940, 930], [W, 890]]);
+
+      const font = "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
+      g.textAlign = "center";
+      g.textBaseline = "alphabetic";
+
+      g.fillStyle = v("--muted");
+      g.font = `600 40px ${font}`;
+      g.fillText("It's been", W / 2, 230);
+
+      const size = String(n).length > 3 ? 300 : 380;
+      g.font = `800 ${size}px ${font}`;
+      const grad = g.createLinearGradient(W / 2 - 250, 280, W / 2 + 250, 560);
+      grad.addColorStop(0, v("--accent-1"));
+      grad.addColorStop(1, v("--accent-2"));
+      g.fillStyle = grad;
+      g.fillText(String(n), W / 2, 560);
+
+      g.fillStyle = v("--text");
+      g.font = `700 54px ${font}`;
+      g.fillText(`${dayWord(n)} since Maddi`, W / 2, 670);
+      g.fillText("last mentioned Alaska", W / 2, 740);
+
+      g.fillStyle = v("--muted");
+      g.font = `500 30px ${font}`;
+      g.fillText(location.host, W / 2, 1020);
+      return c;
+    }
+
+    $("shareBtn").onclick = async () => {
+      if (!state) return;
+      const canvas = await drawCard();
+      const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
+      const file = new File([blob], `alaska-${days()}-days.png`, { type: "image/png" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try { await navigator.share({ files: [file], text: shareText() }); } catch {}
+        return;
+      }
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = file.name;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      toast("Image downloaded");
+    };
+
+    load(true).catch(() => { $("since").textContent = "Couldn't load the count."; });
+    setInterval(() => render(), 60 * 1000);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") load().catch(() => {});
+    });
+  </script>
+</body>
+</html>
