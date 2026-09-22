@@ -114,21 +114,10 @@
     }
     .since { color: var(--muted); margin: 0; font-size: 15px; min-height: 1.4em; }
 
-    .stats {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 32px 0 24px;
-    }
-    .stat {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
-      padding: 16px; box-shadow: var(--shadow);
-      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-    }
-    .stat b {
-      display: block; font-size: 26px; font-weight: 700; letter-spacing: -0.02em;
-      font-variant-numeric: tabular-nums;
-    }
-    .stat span { color: var(--muted); font-size: 13px; font-weight: 500; }
+    .best { color: var(--muted); margin: 4px 0 0; font-size: 14px; min-height: 1.3em; }
+    .best b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
 
-    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 36px; }
     button {
       font: inherit; font-size: 15px; font-weight: 600; cursor: pointer;
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -195,10 +184,7 @@
     <div class="label" id="label">days since Maddi last mentioned Alaska</div>
     <p class="since" id="since"></p>
 
-    <div class="stats">
-      <div class="stat"><b id="best">–</b><span>Longest streak</span></div>
-      <div class="stat"><b id="resets">–</b><span>Times mentioned</span></div>
-    </div>
+    <p class="best" id="best"></p>
 
     <div class="actions">
       <button class="primary" id="resetBtn">
@@ -283,8 +269,8 @@
       if (animate) animateCount(n); else $("count").textContent = n;
       $("label").textContent = `${dayWord(n)} since Maddi last mentioned Alaska`;
       $("since").textContent = sinceText();
-      $("best").textContent = Math.max(state.best, n);
-      $("resets").textContent = state.resets;
+      const best = Math.max(state.best, n);
+      $("best").innerHTML = best > 0 ? `Longest streak: <b>${best}</b> ${dayWord(best)}` : "";
       document.title = `${n} ${dayWord(n)} since Maddi mentioned Alaska`;
     }
 
@@ -298,7 +284,11 @@
 
     async function load(animate) {
       const res = await fetch("/api/state", { cache: "no-store" });
-      state = await res.json();
+      const data = await res.json().catch(() => ({
+        error: `The counter's server code didn't respond (HTTP ${res.status}). Check that the latest deployment succeeded.`,
+      }));
+      if (!res.ok || data.error) throw new Error(data.error || `HTTP ${res.status}`);
+      state = data;
       render(animate);
     }
 
@@ -439,7 +429,7 @@
       toast("Image downloaded");
     };
 
-    load(true).catch(() => { $("since").textContent = "Couldn't load the count."; });
+    load(true).catch((err) => { $("since").textContent = "Couldn't load the count. " + err.message; });
     setInterval(() => render(), 60 * 1000);
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") load().catch(() => {});
