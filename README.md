@@ -1,9 +1,16 @@
 # ak_tracker
 
-Days since Maddi last mentioned Alaska. Live at **ak.andrewlaurin.com**.
+"Days since…" counters, served by one Cloudflare Worker:
+
+| Address | Counter |
+| --- | --- |
+| **ak.andrewlaurin.com** | Days since Maddi last mentioned Alaska |
+| **banff.andrewlaurin.com** | Days since Dom last mentioned Banff Sunshine Village |
+
+Each address has its own separate count. The names, text and addresses are in `src/sites.js`.
 
 - A big counter that goes up by one each calendar day, plus the longest streak so far
-- **She mentioned it** resets the count to 0
+- **She mentioned it** / **Dom mentioned it** resets the count to 0 (PIN required)
 - **Share image** saves or shares a square picture of the count
 - **Copy text** copies a one-liner with the link
 - Pasting the link into iMessage, Slack and similar apps shows the current count in the preview
@@ -28,12 +35,21 @@ deploys automatically.
 The storage for the count is created automatically on the first deploy. It's the
 `AK_KV` binding in `wrangler.jsonc`, so there's nothing to set up for it.
 
-### Step 2: Put it on ak.andrewlaurin.com
+### Step 2: Add each address
 
-1. In the Worker, open **Settings**, then **Domains & Routes**, and click **Add**.
-2. Choose **Custom domain**, enter `ak.andrewlaurin.com`, and click **Add domain**.
+For each address (`ak.andrewlaurin.com` and `banff.andrewlaurin.com`):
+
+1. In the **ak-tracker** Worker, open **Settings**, then **Domains & Routes**, and click **Add**.
+2. Choose **Custom domain**, enter the address, and click **Add domain**.
    Because andrewlaurin.com is already on Cloudflare, it creates the DNS record and
    the security certificate for you.
+
+### Adding another counter later
+
+1. In `src/sites.js`, copy one of the entries and change `id`, `hosts` (the address),
+   `kvKey` (any new unique value, like `state:yourname`), `person`, `place`,
+   `resetLabel` and `emoji`. Merge to `main`.
+2. Add the new address to the Worker, as in Step 2.
 
 ### Later
 
@@ -56,7 +72,8 @@ The storage for the count is created automatically on the first deploy. It's the
 | --- | --- |
 | `public/index.html` | The whole page (HTML/CSS/JS, no build step) |
 | `src/worker.js` | `GET /api/state` returns the count, `POST` resets it to now. Serves `/` with the live count in the page title and link-preview tags |
-| `src/state.js` | KV and day-counting helpers |
+| `src/sites.js` | The counters: address, names, button text, emoji, and where each count is stored |
+| `src/state.js` | KV and day-counting helpers, PIN, timezone |
 | `wrangler.jsonc` | Worker config: static assets from `public/`, the `AK_KV` storage binding |
 
 ## Local dev (optional)
@@ -64,3 +81,6 @@ The storage for the count is created automatically on the first deploy. It's the
 ```sh
 npx wrangler dev
 ```
+
+Open `http://localhost:8787/` for the first counter, or add `?site=banff` to see the Banff one.
+The same `?site=` trick works on the Worker's `workers.dev` address.
