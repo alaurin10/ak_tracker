@@ -1,0 +1,17 @@
+{
+  "name": "ak-tracker",
+  "main": "src/worker.js",
+  "compatibility_date": "2025-09-01",
+  "assets": {
+    "directory": "public",
+    "binding": "ASSETS",
+    // Let the worker handle "/" (live count in link previews) and /api/*.
+    "run_worker_first": ["/", "/api/*"]
+  },
+  // No id: Cloudflare creates the KV namespace on first deploy, or keeps
+  // the one already bound to this Worker as AK_KV.
+  "kv_namespaces": [{ "binding": "AK_KV" }],
+  // Keep variables set in the dashboard (e.g. TIMEZONE) across deploys.
+  "keep_vars": true,
+  "observability": { "enabled": true }
+}
