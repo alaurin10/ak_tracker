@@ -2,7 +2,7 @@
 
 Days since Maddi last mentioned Alaska. Live at **ak.andrewlaurin.com**.
 
-- A big counter that goes up by one each calendar day
+- A big counter that goes up by one each calendar day, plus the longest streak so far
 - **She mentioned it** resets the count to 0
 - **Share image** saves or shares a square picture of the count
 - **Copy text** copies a one-liner with the link
@@ -94,8 +94,10 @@ Each phone or computer asks for the PIN on its first reset and remembers it afte
 
 ### Troubleshooting
 
-- **Page says "Couldn't load the count":** the KV binding is missing, or its variable name isn't
-  exactly `AK_KV`. Check Step 4, then redeploy.
+- **Page says "Couldn't load the count":** the text after it says why. Usually the KV binding is
+  missing, its name isn't exactly `AK_KV`, it was added only for the **Preview** environment
+  instead of **Production**, or the site wasn't redeployed afterward (Step 6). Settings only
+  take effect after a new deployment.
 - **Reset keeps asking for the PIN:** it's case-sensitive. To change the PIN, redo Step 5 and then Step 6.
 - **Custom domain stuck on "Verifying":** give it up to 15 minutes. It won't activate if
   there's already a DNS record named `ak`. In that case, delete that record under

@@ -7,7 +7,11 @@ const json = (body, status = 200) =>
   });
 
 export async function onRequestGet({ env }) {
-  return json(view(await readState(env), env));
+  try {
+    return json(view(await readState(env), env));
+  } catch (err) {
+    return json({ error: err.message }, 500);
+  }
 }
 
 // Reset the counter to now. Body: { pin?: string }.
@@ -19,14 +23,14 @@ export async function onRequestPost({ request, env }) {
     return json({ error: "Wrong PIN" }, 401);
   }
 
-  const now = new Date();
-  const state = await readState(env);
-  const streak = daysBetween(new Date(state.lastReset), now, timezone(env));
-  const next = {
-    lastReset: now.toISOString(),
-    resets: state.resets + 1,
-    best: Math.max(state.best, streak),
-  };
-  await writeState(env, next);
-  return json(view(next, env, now));
+  try {
+    const now = new Date();
+    const state = await readState(env);
+    const streak = daysBetween(new Date(state.lastReset), now, timezone(env));
+    const next = { lastReset: now.toISOString(), best: Math.max(state.best, streak) };
+    await writeState(env, next);
+    return json(view(next, env, now));
+  } catch (err) {
+    return json({ error: err.message }, 500);
+  }
 }
