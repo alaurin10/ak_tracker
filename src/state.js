@@ -2,11 +2,11 @@
 
 const KEY = "state";
 
-export const DEFAULT_TIMEZONE = "America/New_York";
+// Days roll over at midnight in this timezone.
+export const TIMEZONE = "America/Los_Angeles";
 
-export function timezone(env) {
-  return env.TIMEZONE || DEFAULT_TIMEZONE;
-}
+// PIN required to reset the counter.
+export const RESET_PIN = "1234";
 
 // Midnight (as a UTC epoch) of the calendar day `date` falls on in `tz`.
 function dayStart(date, tz) {
@@ -43,14 +43,13 @@ export async function writeState(env, state) {
 }
 
 // State plus derived fields, as returned to clients.
-export function view(state, env, now = new Date()) {
-  const tz = timezone(env);
-  const days = daysBetween(new Date(state.lastReset), now, tz);
+export function view(state, now = new Date()) {
+  const days = daysBetween(new Date(state.lastReset), now, TIMEZONE);
   return {
     lastReset: state.lastReset,
     days,
     best: Math.max(state.best, days),
-    timezone: tz,
-    pinRequired: Boolean(env.RESET_PIN),
+    timezone: TIMEZONE,
+    pinRequired: true,
   };
 }

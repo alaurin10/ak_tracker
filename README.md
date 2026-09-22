@@ -28,18 +28,7 @@ deploys automatically.
 The storage for the count is created automatically on the first deploy. It's the
 `AK_KV` binding in `wrangler.jsonc`, so there's nothing to set up for it.
 
-### Step 2 (recommended): Set a PIN so only you can reset it
-
-Without a PIN, anyone with the link can reset the counter.
-
-1. Open the **ak-tracker** Worker, then **Settings**, then **Variables and Secrets**,
-   and click **Add**.
-2. Set **Type** to **Secret**, **Variable name** to `RESET_PIN`, and **Value** to any
-   PIN you like. Click **Deploy** (or **Save**).
-
-Each phone or computer asks for the PIN on its first reset and remembers it after that.
-
-### Step 3: Put it on ak.andrewlaurin.com
+### Step 2: Put it on ak.andrewlaurin.com
 
 1. In the Worker, open **Settings**, then **Domains & Routes**, and click **Add**.
 2. Choose **Custom domain**, enter `ak.andrewlaurin.com`, and click **Add domain**.
@@ -49,16 +38,13 @@ Each phone or computer asks for the PIN on its first reset and remembers it afte
 ### Later
 
 - **Updating the site:** any change merged into `main` on GitHub deploys automatically.
-- **Timezone:** a new day starts at midnight US Eastern. To change it, add a **Text**
-  variable named `TIMEZONE` under **Settings**, then **Variables and Secrets**, set to
-  something like `America/Los_Angeles`. Deploys keep it.
-- **Changing the PIN:** edit `RESET_PIN` in the same place.
+- **PIN and timezone:** both are set at the top of `src/state.js` (`RESET_PIN`, currently
+  `1234`, and `TIMEZONE`, currently `America/Los_Angeles`). Edit them there and merge to `main`.
 
 ### Troubleshooting
 
 - **Page says "Couldn't load the count":** the text after it says why. Check the latest
   build under the Worker's **Deployments** tab (or **Builds**) and make sure it succeeded.
-- **Reset keeps asking for the PIN:** it's case-sensitive. To change the PIN, redo Step 2.
 - **Custom domain won't activate:** it can't if there's already a DNS record named `ak`.
   Delete that record under **andrewlaurin.com**, **DNS**, **Records**, and try again.
 
@@ -76,6 +62,5 @@ Each phone or computer asks for the PIN on its first reset and remembers it afte
 ## Local dev (optional)
 
 ```sh
-echo 'RESET_PIN=1234' > .dev.vars   # optional
 npx wrangler dev
 ```
