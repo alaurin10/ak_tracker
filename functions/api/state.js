@@ -10,7 +10,7 @@ export async function onRequestGet({ env }) {
   return json(view(await readState(env), env));
 }
 
-// Reset the counter. Body: { pin?: string, at?: ISO date string }.
+// Reset the counter to now. Body: { pin?: string }.
 // If the RESET_PIN secret is set, the matching pin is required.
 export async function onRequestPost({ request, env }) {
   const body = await request.json().catch(() => ({}));
@@ -20,16 +20,10 @@ export async function onRequestPost({ request, env }) {
   }
 
   const now = new Date();
-  const at = body.at ? new Date(body.at) : now;
-  if (Number.isNaN(at.getTime()) || at > now) {
-    return json({ error: "Invalid date" }, 400);
-  }
-
   const state = await readState(env);
-  const tz = timezone(env);
-  const streak = daysBetween(new Date(state.lastReset), at, tz);
+  const streak = daysBetween(new Date(state.lastReset), now, timezone(env));
   const next = {
-    lastReset: at.toISOString(),
+    lastReset: now.toISOString(),
     resets: state.resets + 1,
     best: Math.max(state.best, streak),
   };
