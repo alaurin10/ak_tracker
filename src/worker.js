@@ -1,4 +1,4 @@
-import { daysBetween, readState, timezone, view, writeState } from "./state.js";
+import { RESET_PIN, TIMEZONE, daysBetween, readState, view, writeState } from "./state.js";
 
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -26,28 +26,28 @@ export default {
 
 async function getState(env) {
   try {
-    return json(view(await readState(env), env));
+    return json(view(await readState(env)));
   } catch (err) {
     return json({ error: err.message }, 500);
   }
 }
 
 // Reset the counter to now. Body: { pin?: string }.
-// If the RESET_PIN secret is set, the matching pin is required.
+// Requires the matching RESET_PIN.
 async function resetState(request, env) {
   const body = await request.json().catch(() => ({}));
 
-  if (env.RESET_PIN && body.pin !== env.RESET_PIN) {
+  if (String(body.pin ?? "") !== RESET_PIN) {
     return json({ error: "Wrong PIN" }, 401);
   }
 
   try {
     const now = new Date();
     const state = await readState(env);
-    const streak = daysBetween(new Date(state.lastReset), now, timezone(env));
+    const streak = daysBetween(new Date(state.lastReset), now, TIMEZONE);
     const next = { lastReset: now.toISOString(), best: Math.max(state.best, streak) };
     await writeState(env, next);
-    return json(view(next, env, now));
+    return json(view(next, now));
   } catch (err) {
     return json({ error: err.message }, 500);
   }
@@ -59,7 +59,7 @@ async function homePage(request, env) {
   const res = await env.ASSETS.fetch(request);
   let days;
   try {
-    days = view(await readState(env), env).days;
+    days = view(await readState(env)).days;
   } catch {
     return res;
   }

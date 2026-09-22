@@ -11,7 +11,5 @@
   // No id: Cloudflare creates the KV namespace on first deploy, or keeps
   // the one already bound to this Worker as AK_KV.
   "kv_namespaces": [{ "binding": "AK_KV" }],
-  // Keep variables set in the dashboard (e.g. TIMEZONE) across deploys.
-  "keep_vars": true,
   "observability": { "enabled": true }
 }
