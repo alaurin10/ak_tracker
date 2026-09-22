@@ -80,24 +80,8 @@
 
     main { position: relative; z-index: 1; width: 100%; max-width: 460px; }
 
-    .eyebrow {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 6px 14px; border-radius: 999px;
-      background: var(--surface); border: 1px solid var(--border);
-      color: var(--muted); font-size: 13px; font-weight: 500;
-      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-    }
-    .dot {
-      width: 7px; height: 7px; border-radius: 50%; background: var(--accent-1);
-      box-shadow: 0 0 0 0 var(--accent-1); animation: pulse 2.4s infinite;
-    }
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-1) 60%, transparent); }
-      70%, 100% { box-shadow: 0 0 0 8px transparent; }
-    }
-
     .count {
-      margin: 20px 0 0;
+      margin: 0;
       font-size: clamp(120px, 38vw, 200px);
       font-weight: 800;
       line-height: 0.95;
@@ -179,9 +163,8 @@
   </div>
 
   <main>
-    <span class="eyebrow"><span class="dot"></span>Alaska watch</span>
     <div class="count" id="count" aria-live="polite">–</div>
-    <div class="label" id="label">days since Maddi last mentioned Alaska</div>
+    <div class="label" id="label">Days since Maddi last mentioned Alaska</div>
     <p class="since" id="since"></p>
 
     <p class="best" id="best"></p>
@@ -267,7 +250,7 @@
       if (!state) return;
       const n = days();
       if (animate) animateCount(n); else $("count").textContent = n;
-      $("label").textContent = `${dayWord(n)} since Maddi last mentioned Alaska`;
+      $("label").textContent = `${n === 1 ? "Day" : "Days"} since Maddi last mentioned Alaska`;
       $("since").textContent = sinceText();
       const best = Math.max(state.best, n);
       $("best").innerHTML = best > 0 ? `Longest streak: <b>${best}</b> ${dayWord(best)}` : "";
