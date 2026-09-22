@@ -28,7 +28,7 @@ export async function readState(env) {
   if (!env.AK_KV) {
     throw new Error(
       "Storage isn't connected. In Cloudflare, add a KV namespace binding named AK_KV " +
-        "(Settings → Bindings) for Production, then redeploy."
+        "(Settings → Bindings), then redeploy."
     );
   }
   const stored = await env.AK_KV.get(KEY, "json");
