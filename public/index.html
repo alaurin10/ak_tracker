@@ -172,7 +172,7 @@
     <div class="actions">
       <button class="primary" id="resetBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
-        She mentioned it
+        <span id="resetText">She mentioned it</span>
       </button>
       <button id="shareBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>
@@ -188,7 +188,7 @@
   <dialog id="resetDialog">
     <form id="resetForm">
       <h2>Reset to 0?</h2>
-      <p>She mentioned Alaska again. Back to square one.</p>
+      <p id="resetBlurb">She mentioned Alaska again. Back to square one.</p>
       <div id="pinRow" hidden>
         <input type="password" id="pin" inputmode="numeric" placeholder="PIN" autocomplete="current-password" aria-label="PIN">
       </div>
@@ -204,6 +204,9 @@
 
   <script>
     const $ = (id) => document.getElementById(id);
+    // Set by the server for this subdomain (see src/sites.js).
+    const SITE = window.SITE || { id: "alaska", person: "Maddi", place: "Alaska", emoji: "🏔️" };
+    const API = "/api/state" + location.search;
     let state = null;
 
     const storage = {
@@ -250,11 +253,11 @@
       if (!state) return;
       const n = days();
       if (animate) animateCount(n); else $("count").textContent = n;
-      $("label").textContent = `${n === 1 ? "Day" : "Days"} since Maddi last mentioned Alaska`;
+      $("label").textContent = `${n === 1 ? "Day" : "Days"} since ${SITE.person} last mentioned ${SITE.place}`;
       $("since").textContent = sinceText();
       const best = Math.max(state.best, n);
       $("best").innerHTML = best > 0 ? `Longest streak: <b>${best}</b> ${dayWord(best)}` : "";
-      document.title = `${n} ${dayWord(n)} since Maddi mentioned Alaska`;
+      document.title = `${n} ${dayWord(n)} since ${SITE.person} mentioned ${SITE.place}`;
     }
 
     function toast(msg) {
@@ -266,7 +269,7 @@
     }
 
     async function load(animate) {
-      const res = await fetch("/api/state", { cache: "no-store" });
+      const res = await fetch(API, { cache: "no-store" });
       const data = await res.json().catch(() => ({
         error: `The counter's server code didn't respond (HTTP ${res.status}). Check that the latest deployment succeeded.`,
       }));
@@ -292,7 +295,7 @@
       const pin = $("pin").value || undefined;
       $("confirmBtn").disabled = true;
       try {
-        const res = await fetch("/api/state", {
+        const res = await fetch(API, {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ pin }),
@@ -325,7 +328,7 @@
     // ---- Share ----
     function shareText() {
       const n = days();
-      return `🏔️ It's been ${n} ${dayWord(n)} since Maddi last mentioned Alaska. ${location.origin}`;
+      return `${SITE.emoji} It's been ${n} ${dayWord(n)} since ${SITE.person} last mentioned ${SITE.place}. ${location.origin}`;
     }
 
     $("copyBtn").onclick = async () => {
@@ -353,7 +356,7 @@
       g.fillRect(0, 0, W, H);
       const glow = g.createRadialGradient(W / 2, -100, 50, W / 2, -100, 900);
       glow.addColorStop(0, v("--bg-glow"));
-      glow.addColorStop(1, "rgba(0,0,0,0)");
+      glow.addColorStop(1, v("--bg"));
       g.fillStyle = glow;
       g.fillRect(0, 0, W, H);
 
@@ -384,10 +387,17 @@
       g.fillStyle = grad;
       g.fillText(String(n), W / 2, 560);
 
+      // Shrink both lines together so long place names fit the card.
+      const lines = [`${dayWord(n)} since ${SITE.person}`, `last mentioned ${SITE.place}`];
+      let lineSize = 54;
+      g.font = `700 ${lineSize}px ${font}`;
+      while (lineSize > 24 && Math.max(...lines.map((l) => g.measureText(l).width)) > W - 120) {
+        lineSize -= 2;
+        g.font = `700 ${lineSize}px ${font}`;
+      }
       g.fillStyle = v("--text");
-      g.font = `700 54px ${font}`;
-      g.fillText(`${dayWord(n)} since Maddi`, W / 2, 670);
-      g.fillText("last mentioned Alaska", W / 2, 740);
+      g.fillText(lines[0], W / 2, 670);
+      g.fillText(lines[1], W / 2, 670 + lineSize * 1.3);
 
       g.fillStyle = v("--muted");
       g.font = `500 30px ${font}`;
@@ -399,7 +409,7 @@
       if (!state) return;
       const canvas = await drawCard();
       const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
-      const file = new File([blob], `alaska-${days()}-days.png`, { type: "image/png" });
+      const file = new File([blob], `${SITE.id}-${days()}-days.png`, { type: "image/png" });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         try { await navigator.share({ files: [file], text: shareText() }); } catch {}
         return;

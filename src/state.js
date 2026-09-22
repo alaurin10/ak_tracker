@@ -1,6 +1,4 @@
-// Shared helpers for the Pages Functions.
-
-const KEY = "state";
+// KV and day-counting helpers.
 
 // Days roll over at midnight in this timezone.
 export const TIMEZONE = "America/Los_Angeles";
@@ -24,22 +22,22 @@ export function daysBetween(from, to, tz) {
   return Math.max(0, Math.round((dayStart(to, tz) - dayStart(from, tz)) / 86400000));
 }
 
-export async function readState(env) {
+export async function readState(env, site) {
   if (!env.AK_KV) {
     throw new Error(
       "Storage isn't connected. In Cloudflare, add a KV namespace binding named AK_KV " +
         "(Settings → Bindings), then redeploy."
     );
   }
-  const stored = await env.AK_KV.get(KEY, "json");
+  const stored = await env.AK_KV.get(site.kvKey, "json");
   if (stored) return stored;
   const fresh = { lastReset: new Date().toISOString(), best: 0 };
-  await env.AK_KV.put(KEY, JSON.stringify(fresh));
+  await env.AK_KV.put(site.kvKey, JSON.stringify(fresh));
   return fresh;
 }
 
-export async function writeState(env, state) {
-  await env.AK_KV.put(KEY, JSON.stringify(state));
+export async function writeState(env, site, state) {
+  await env.AK_KV.put(site.kvKey, JSON.stringify(state));
 }
 
 // State plus derived fields, as returned to clients.
