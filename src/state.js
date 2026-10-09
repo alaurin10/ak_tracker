@@ -31,7 +31,7 @@ export async function readState(env, site) {
   }
   const stored = await env.AK_KV.get(site.kvKey, "json");
   if (stored) return stored;
-  const fresh = { lastReset: new Date().toISOString(), best: 0 };
+  const fresh = { lastReset: new Date().toISOString() };
   await env.AK_KV.put(site.kvKey, JSON.stringify(fresh));
   return fresh;
 }
@@ -46,7 +46,6 @@ export function view(state, now = new Date()) {
   return {
     lastReset: state.lastReset,
     days,
-    best: Math.max(state.best, days),
     timezone: TIMEZONE,
     pinRequired: true,
   };

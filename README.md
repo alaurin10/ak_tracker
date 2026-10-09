@@ -9,7 +9,7 @@
 
 Each address has its own separate count. The names, text and addresses are in `src/sites.js`.
 
-- A big counter that goes up by one each calendar day, plus the longest streak so far
+- A big counter that goes up by one each calendar day
 - **She mentioned it** / **Dom mentioned it** resets the count to 0 (PIN required)
 - **Share image** saves or shares a square picture of the count
 - **Copy text** copies a one-liner with the link

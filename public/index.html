@@ -98,8 +98,6 @@
     }
     .since { color: var(--muted); margin: 0; font-size: 15px; min-height: 1.4em; }
 
-    .best { color: var(--muted); margin: 4px 0 0; font-size: 14px; min-height: 1.3em; }
-    .best b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
 
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 36px; }
     button {
@@ -166,8 +164,6 @@
     <div class="count" id="count" aria-live="polite">–</div>
     <div class="label" id="label">Days since Maddi last mentioned Alaska</div>
     <p class="since" id="since"></p>
-
-    <p class="best" id="best"></p>
 
     <div class="actions">
       <button class="primary" id="resetBtn">
@@ -255,8 +251,6 @@
       if (animate) animateCount(n); else $("count").textContent = n;
       $("label").textContent = `${n === 1 ? "Day" : "Days"} since ${SITE.person} last mentioned ${SITE.place}`;
       $("since").textContent = sinceText();
-      const best = Math.max(state.best, n);
-      $("best").innerHTML = best > 0 ? `Longest streak: <b>${best}</b> ${dayWord(best)}` : "";
       document.title = `${n} ${dayWord(n)} since ${SITE.person} mentioned ${SITE.place}`;
     }
 
