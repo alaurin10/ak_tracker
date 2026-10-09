@@ -1,5 +1,5 @@
 import { siteFor } from "./sites.js";
-import { RESET_PIN, TIMEZONE, daysBetween, readState, view, writeState } from "./state.js";
+import { RESET_PIN, readState, view, writeState } from "./state.js";
 
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -45,9 +45,8 @@ async function resetState(request, env, site) {
 
   try {
     const now = new Date();
-    const state = await readState(env, site);
-    const streak = daysBetween(new Date(state.lastReset), now, TIMEZONE);
-    const next = { lastReset: now.toISOString(), best: Math.max(state.best, streak) };
+    await readState(env, site); // Fails with a clear message if storage isn't connected.
+    const next = { lastReset: now.toISOString() };
     await writeState(env, site, next);
     return json(view(next, now));
   } catch (err) {
